@@ -63,11 +63,6 @@ const HeroSection: React.FC = () => {
           </motion.div>
         </div>
       </div>
-
-      {/* Optional Decorative Floating Elements */}
-      {/* These elements add subtle depth without causing distraction */}
-      {/* Ensure they do not cause horizontal overflow */}
-      {/* Uncomment and adjust if you wish to include them */}
       
       <motion.div
         className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full opacity-20 blur-xl"
