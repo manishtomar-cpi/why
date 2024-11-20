@@ -26,9 +26,9 @@ const HeroSection: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            Empowering Students,
+            Delicious, nutritious, and affordable meals,
             <br />
-            One Meal at a Time
+            or students and professionals far from home.
           </motion.h1>
 
           {/* Description */}
