@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import Button from '../Button';
 import Link from 'next/link';
 import { ROUTES } from '../../constants/routes';
-import { COLORS } from '../../constants/colors';
+// import { COLORS } from '../../constants/colors';
 import Image from 'next/image';
 import { FaArrowRight } from 'react-icons/fa';
 

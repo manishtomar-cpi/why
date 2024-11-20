@@ -4,11 +4,11 @@
 import React from 'react';
 import Slider from 'react-slick';
 import { FaStar, FaArrowRight } from 'react-icons/fa';
-import { GiMeal } from 'react-icons/gi';
-import { COLORS } from '../../constants/colors';
+// import { GiMeal } from 'react-icons/gi';
+// import { COLORS } from '../../constants/colors';
 import Image from 'next/image';
-import Button from '../Button'; // Ensure the updated Button component is imported
-import Link from 'next/link'; // Import Link for navigation
+// import Button from '../Button'; // Ensure the updated Button component is imported
+// import Link from 'next/link'; // Import Link for navigation
 
 // Import Slick Carousel CSS
 import 'slick-carousel/slick/slick.css';

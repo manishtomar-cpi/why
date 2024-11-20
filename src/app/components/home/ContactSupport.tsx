@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 import { COLORS } from '../../constants/colors';
 import Button from '../Button';
-import Link from 'next/link';
-import { ROUTES } from '../../constants/routes';
+// import Link from 'next/link';
+// import { ROUTES } from '../../constants/routes';
 
 const ContactSupport: React.FC = () => {
   return (

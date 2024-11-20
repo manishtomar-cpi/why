@@ -14,7 +14,7 @@ import {
   FaHeadset,
   FaArrowRight,
 } from 'react-icons/fa';
-import { COLORS } from '../../constants/colors';
+// import { COLORS } from '../../constants/colors';
 import Link from 'next/link'; // Import Link for navigation
 
 interface Feature {

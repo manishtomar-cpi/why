@@ -8,7 +8,7 @@ import {
   FaLock,
   FaLeaf,
 } from 'react-icons/fa';
-import { COLORS } from '../../constants/colors';
+// import { COLORS } from '../../constants/colors';
 
 interface Badge {
   id: number;

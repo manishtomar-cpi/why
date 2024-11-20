@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import Button from '../Button';
 import { ROUTES } from '../../constants/routes';
 import { FaArrowRight } from 'react-icons/fa';
-import { COLORS } from '../../constants/colors';
+// import { COLORS } from '../../constants/colors';
 
 const CallToAction: React.FC = () => {
   return (
