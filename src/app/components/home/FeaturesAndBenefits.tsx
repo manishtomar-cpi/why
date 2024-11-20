@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fa';
 // import { COLORS } from '../../constants/colors';
 import Link from 'next/link'; // Import Link for navigation
-
+import { ROUTES } from '../../constants/routes';
 interface Feature {
   id: number;
   title: string;
@@ -26,72 +26,73 @@ interface Feature {
 }
 
 const features: Feature[] = [
-  {
-    id: 1,
-    title: 'Fresh Ingredients',
-    description:
-      'We use only the freshest ingredients to prepare your meals, ensuring quality and taste.',
-    icon: <FaLeaf size={40} color="#34D399" aria-label="Fresh Ingredients" />, // Green
-    link: '/features/fresh-ingredients',
-  },
-  {
-    id: 2,
-    title: 'Timely Delivery',
-    description:
-      'Our reliable delivery service ensures your meals arrive on time, every time.',
-    icon: <FaClock size={40} color="#3B82F6" aria-label="Timely Delivery" />, // Blue
-    link: '/features/timely-delivery',
-  },
-  {
-    id: 3,
-    title: 'Affordable Pricing',
-    description:
-      'High-quality meals at pocket-friendly prices, making healthy eating accessible.',
-    icon: <FaMoneyBillWave size={40} color="#FBBF24" aria-label="Affordable Pricing" />, // Amber
-    link: '/features/affordable-pricing',
-  },
-  {
-    id: 4,
-    title: 'Customized Diet Plans',
-    description:
-      'Tailored meal plans to meet your specific dietary requirements and preferences.',
-    icon: <FaUserAlt size={40} color="#EF4444" aria-label="Customized Diet Plans" />, // Red
-    link: '/features/custom-diet-plans',
-  },
-  {
-    id: 5,
-    title: 'Sustainability',
-    description:
-      'Committed to eco-friendly practices, reducing our carbon footprint with every meal.',
-    icon: <FaRecycle size={40} color="#10B981" aria-label="Sustainability" />, // Green
-    link: '/features/sustainability',
-  },
-  {
-    id: 6,
-    title: 'Nutritional Expertise',
-    description:
-      'Our team of professional nutritionists ensures your meals are balanced and healthy.',
-    icon: <FaStethoscope size={40} color="#3B82F6" aria-label="Nutritional Expertise" />, // Blue
-    link: '/features/nutritional-expertise',
-  },
-  {
-    id: 7,
-    title: 'Flexible Subscription Plans',
-    description:
-      'Choose from a variety of subscription options that best fit your lifestyle and needs.',
-    icon: <FaRegHandshake size={40} color="#F59E0B" aria-label="Flexible Subscription Plans" />, // Amber
-    link: '/features/subscription-plans',
-  },
-  {
-    id: 8,
-    title: '24/7 Customer Support',
-    description:
-      'Our dedicated support team is available around the clock to assist you with any queries.',
-    icon: <FaHeadset size={40} color="#EF4444" aria-label="24/7 Customer Support" />, // Red
-    link: '/features/customer-support',
-  },
-  // Add more features as needed
-];
+    {
+      id: 1,
+      title: 'Fresh Ingredients',
+      description:
+        'We use only the freshest ingredients to prepare your meals, ensuring quality and taste.',
+      icon: <FaLeaf size={40} color="#34D399" aria-label="Fresh Ingredients" />, // Green
+      link: ROUTES.featuresFreshIngredients,
+    },
+    {
+      id: 2,
+      title: 'Timely Delivery',
+      description:
+        'Our reliable delivery service ensures your meals arrive on time, every time.',
+      icon: <FaClock size={40} color="#3B82F6" aria-label="Timely Delivery" />, // Blue
+      link: ROUTES.featuresTimelyDelivery,
+    },
+    {
+      id: 3,
+      title: 'Affordable Pricing',
+      description:
+        'High-quality meals at pocket-friendly prices, making healthy eating accessible.',
+      icon: <FaMoneyBillWave size={40} color="#FBBF24" aria-label="Affordable Pricing" />, // Amber
+      link: ROUTES.featuresAffordablePricing,
+    },
+    {
+      id: 4,
+      title: 'Customized Diet Plans',
+      description:
+        'Tailored meal plans to meet your specific dietary requirements and preferences.',
+      icon: <FaUserAlt size={40} color="#EF4444" aria-label="Customized Diet Plans" />, // Red
+      link: ROUTES.featuresCustomDietPlans,
+    },
+    {
+      id: 5,
+      title: 'Sustainability',
+      description:
+        'Committed to eco-friendly practices, reducing our carbon footprint with every meal.',
+      icon: <FaRecycle size={40} color="#10B981" aria-label="Sustainability" />, // Green
+      link: ROUTES.featuresSustainability,
+    },
+    {
+      id: 6,
+      title: 'Nutritional Expertise',
+      description:
+        'Our team of professional nutritionists ensures your meals are balanced and healthy.',
+      icon: <FaStethoscope size={40} color="#3B82F6" aria-label="Nutritional Expertise" />, // Blue
+      link: ROUTES.featuresNutritionalExpertise,
+    },
+    {
+      id: 7,
+      title: 'Flexible Subscription Plans',
+      description:
+        'Choose from a variety of subscription options that best fit your lifestyle and needs.',
+      icon: <FaRegHandshake size={40} color="#F59E0B" aria-label="Flexible Subscription Plans" />, // Amber
+      link: ROUTES.featuresSubscriptionPlans,
+    },
+    {
+      id: 8,
+      title: '24/7 Customer Support',
+      description:
+        'Our dedicated support team is available around the clock to assist you with any queries.',
+      icon: <FaHeadset size={40} color="#EF4444" aria-label="24/7 Customer Support" />, // Red
+      link: ROUTES.featuresCustomerSupport,
+    },
+    // Add more features as needed
+  ];
+
 
 const FeaturesAndBenefits: React.FC = () => {
   return (

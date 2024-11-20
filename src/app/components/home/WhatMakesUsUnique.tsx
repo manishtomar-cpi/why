@@ -11,6 +11,8 @@ import {
   FaArrowRight,
 } from 'react-icons/fa';
 import Link from 'next/link'; // Ensure this is the correct import
+import { ROUTES } from '../../constants/routes';
+
 
 interface UniqueFeature {
   id: number;
@@ -21,40 +23,40 @@ interface UniqueFeature {
 }
 
 const uniqueFeatures: UniqueFeature[] = [
-  {
-    id: 1,
-    title: 'Local Farmer Partnerships',
-    description:
-      'We collaborate with local farmers near our kitchen to source the freshest organic fruits and vegetables, ensuring top-notch quality in every meal.',
-    icon: <FaLeaf size={40} color="#34D399" aria-label="Local Farmer Partnerships" />,
-    link: '/about/our-farmers',
-  },
-  {
-    id: 2,
-    title: 'Open Kitchen Visits',
-    description:
-      'Experience transparency and trust by visiting our kitchen anytime. See firsthand how we maintain high standards in meal preparation.',
-    icon: <FaClock size={40} color="#3B82F6" aria-label="Open Kitchen Visits" />,
-    link: '/about/visit-kitchen',
-  },
-  {
-    id: 3,
-    title: 'Community Support',
-    description:
-      'In partnership with local trusts, we provide leftover meals to the elderly and homeless at no cost, fostering a supportive community.',
-    icon: <FaHandsHelping size={40} color="#F59E0B" aria-label="Community Support" />,
-    link: '/about/community-support',
-  },
-  {
-    id: 4,
-    title: 'Student Assistance Programs',
-    description:
-      'Students can return unused tiffins and earn points towards future purchases, ensuring that no meal goes to waste while supporting educational pursuits.',
-    icon: <FaGraduationCap size={40} color="#EF4444" aria-label="Student Assistance Programs" />,
-    link: '/about/student-assistance',
-  },
-  // Add more features as needed
-];
+    {
+      id: 1,
+      title: 'Local Farmer Partnerships',
+      description:
+        'We collaborate with local farmers near our kitchen to source the freshest organic fruits and vegetables, ensuring top-notch quality in every meal.',
+      icon: <FaLeaf size={40} color="#34D399" aria-label="Local Farmer Partnerships" />,
+      link: ROUTES.aboutOurFarmers,
+    },
+    {
+      id: 2,
+      title: 'Open Kitchen Visits',
+      description:
+        'Experience transparency and trust by visiting our kitchen anytime. See firsthand how we maintain high standards in meal preparation.',
+      icon: <FaClock size={40} color="#3B82F6" aria-label="Open Kitchen Visits" />,
+      link: ROUTES.aboutVisitKitchen,
+    },
+    {
+      id: 3,
+      title: 'Community Support',
+      description:
+        'In partnership with local trusts, we provide leftover meals to the elderly and homeless at no cost, fostering a supportive community.',
+      icon: <FaHandsHelping size={40} color="#F59E0B" aria-label="Community Support" />,
+      link: ROUTES.aboutCommunitySupport,
+    },
+    {
+      id: 4,
+      title: 'Student Assistance Programs',
+      description:
+        'Students can return unused tiffins and earn points towards future purchases, ensuring that no meal goes to waste while supporting educational pursuits.',
+      icon: <FaGraduationCap size={40} color="#EF4444" aria-label="Student Assistance Programs" />,
+      link: ROUTES.aboutStudentAssistance,
+    },
+    // Add more features as needed
+  ];
 
 const WhatMakesUsUnique: React.FC = () => {
   return (
