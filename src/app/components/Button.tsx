@@ -1,12 +1,18 @@
-// src/app/components/Button.tsx
 'use client';
 
-import React from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 import { motion, MotionProps } from 'framer-motion';
+import cn from 'classnames'; 
 import { COLORS } from '../constants/colors';
-import cn from 'classnames'; // Install this if not already installed: npm install classnames
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, MotionProps {
+// Custom type to merge attributes while resolving conflicts
+type MergedButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  keyof MotionProps
+> &
+  MotionProps;
+
+interface ButtonProps extends MergedButtonProps {
   variant?: 'primary' | 'secondary';
   children: React.ReactNode;
   asChild?: boolean;
