@@ -112,7 +112,7 @@ const Footer: React.FC = () => {
           {/* Contact Information */}
           <div className="mb-4 md:mb-0 text-center md:text-left">
             <p className="text-gray-400">
-              123 Main Street, Mumbai, Maharashtra, India
+              123 Main Street India
             </p>
             <p className="text-gray-400">
               Phone: +91 (22) 1234-5678

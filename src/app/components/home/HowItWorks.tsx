@@ -4,13 +4,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
+  FaMapMarkerAlt,
   FaUtensils,
-  FaClipboardList,
   FaCreditCard,
-  FaTruck,
+  FaArrowRight,
 } from 'react-icons/fa';
+import { GiMeal } from 'react-icons/gi'; // Updated icon for delivery
 import { COLORS } from '../../constants/colors';
 import Button from '../Button'; // Ensure the updated Button component is imported
+import Link from 'next/link'; // Import Link for navigation
 
 interface Step {
   id: number;
@@ -22,31 +24,31 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: 'Browse the Menu',
+    title: 'Choose Your Nearest Kitchen',
     description:
-      'Explore our diverse range of healthy and delicious meals tailored to your preferences.',
-    icon: <FaUtensils size={32} color={COLORS.primary} />, // Purple
+      'Select the kitchen closest to your location to ensure timely and fresh delivery of your meals.',
+    icon: <FaMapMarkerAlt size={32} color={COLORS.primary} aria-label="Choose Your Nearest Kitchen" />, // Purple
   },
   {
     id: 2,
-    title: 'Select Your Plan',
+    title: 'Browse and Select Meals',
     description:
-      'Choose from Regular, Premium, or Diet-specific meal plans that suit your needs.',
-    icon: <FaClipboardList size={32} color={COLORS.primary} />, // Purple
+      'Explore our diverse menu and customize your meals to fit your dietary preferences and needs.',
+    icon: <FaUtensils size={32} color={COLORS.primary} aria-label="Browse and Select Meals" />, // Purple
   },
   {
     id: 3,
     title: 'Make a Payment',
     description:
-      'Securely pay for your selected meal plan with our easy payment options.',
-    icon: <FaCreditCard size={32} color={COLORS.primary} />, // Purple
+      'Securely pay for your selected meal plan using our easy and trusted payment options.',
+    icon: <FaCreditCard size={32} color={COLORS.primary} aria-label="Make a Payment" />, // Purple
   },
   {
     id: 4,
     title: 'Enjoy Fresh Delivery',
     description:
-      'Receive your fresh and nutritious meals delivered right to your doorstep on time.',
-    icon: <FaTruck size={32} color={COLORS.primary} />, // Purple
+      'Receive your nutritious and delicious meals delivered right to your doorstep on time using our eco-friendly tiffin boxes.',
+    icon: <GiMeal size={32} color={COLORS.primary} aria-label="Enjoy Fresh Delivery" />, // Updated to meal icon
   },
 ];
 
@@ -59,16 +61,30 @@ const HowItWorks: React.FC = () => {
           How It Works
         </h2>
 
-        {/* Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Steps Grid with Staggered Animations */}
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.2,
+              },
+            },
+            hidden: {},
+          }}
+        >
           {steps.map((step) => (
             <motion.div
               key={step.id}
               className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center transition-transform transform hover:scale-105"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: step.id * 0.2 }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
             >
               {/* Icon */}
               <div className="mb-4">{step.icon}</div>
@@ -88,6 +104,16 @@ const HowItWorks: React.FC = () => {
               </Button> */}
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Optional: Get Started Button */}
+        <div className="mt-12 text-center">
+          <Button variant="primary" asChild>
+            <Link href="/signup" className="inline-flex items-center px-6 py-3">
+              Get Started
+              <FaArrowRight className="ml-2" /> {/* Ensure FaArrowRight is imported */}
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

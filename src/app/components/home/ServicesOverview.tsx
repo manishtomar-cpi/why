@@ -9,11 +9,10 @@ import Link from 'next/link';
 import { ROUTES } from '../../constants/routes';
 import { FaLeaf, FaStar } from 'react-icons/fa';
 import { COLORS } from '../../constants/colors';
-import Image from 'next/image'; // Optional: Use if you plan to include images
 
 const serviceIcons: Record<Service['id'], JSX.Element> = {
-  regular: <FaLeaf size={48} color={COLORS.primary} />, // Purple icon for Regular
-  premium: <FaStar size={48} color={COLORS.primary} />, // Purple icon for Premium
+  regular: <FaLeaf size={48} color={COLORS.primary} />, // Icon for Regular Plan
+  premium: <FaStar size={48} color={COLORS.primary} />, // Icon for Premium Plan
 };
 
 const ServicesOverview: React.FC = () => {
@@ -27,7 +26,7 @@ const ServicesOverview: React.FC = () => {
           {SERVICES.map((service) => (
             <motion.div
               key={service.id}
-              className="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer group overflow-hidden flex flex-col justify-between"
+              className="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col justify-between"
               whileHover={{ scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -37,38 +36,26 @@ const ServicesOverview: React.FC = () => {
               {/* Icon and Title */}
               <div className="flex flex-col items-center md:items-start">
                 <div className="mb-4">{serviceIcons[service.id]}</div>
-                <h3 className="text-2xl font-semibold mb-2">{service.name} Plan</h3>
+                <h3 className="text-2xl font-semibold mb-1">{service.name} Plan</h3>
+                <p className="text-lg font-bold text-primary">
+                  {service.id === 'regular' ? '₹45/meal' : '₹59/meal'}
+                </p>
               </div>
 
-              {/* Service Details */}
-              <div className="mt-4 flex-grow">
-                {service.id === 'regular' && (
-                  <div className="text-gray-700">
-                    <h4 className="text-xl font-bold mb-2">Regular Plan</h4>
-                    <p className="mb-2">
-                      Our Regular Plan offers a menu based on the days of the week, ensuring you receive healthy and balanced meals with salads.
-                    </p>
-                    <ul className="list-disc list-inside mb-4">
-                      <li>Choose between random predefined meals or a weekly menu</li>
-                      <li>No meal customization</li>
-                      <li>Healthy meals with salads</li>
-                      <li>Affordable price: <span className="font-bold">₹49</span></li>
-                    </ul>
-                  </div>
-                )}
-                {service.id === 'premium' && (
-                  <div className="text-gray-700">
-                    <h4 className="text-xl font-bold mb-2">Premium Plan</h4>
-                    <p className="mb-2">
-                      Our Premium Plan allows you to customize your meals, offering higher quality ingredients and flexibility to add or reduce items.
-                    </p>
-                    <ul className="list-disc list-inside mb-4">
-                      <li>Ability to choose preferred meals</li>
-                      <li>Flexible item additions or reductions</li>
-                      <li>Higher quality meals compared to regular</li>
-                      <li>Premium price: <span className="font-bold">₹69</span></li>
-                    </ul>
-                  </div>
+              {/* Brief Description */}
+              <div className="mt-4 text-gray-700">
+                {service.id === 'regular' ? (
+                  <ul className="list-disc list-inside space-y-2">
+                    <li>Choose pre-defined daily menus or customize from healthy options</li>
+                    <li>Adjust up to 6 chapatis per meal</li>
+                    <li>Includes roti, varied sabzi, and fresh salad</li>
+                  </ul>
+                ) : (
+                  <ul className="list-disc list-inside space-y-2">
+                    <li>Weekly meal customization with exclusive dishes</li>
+                    <li>Includes salads with seasonal fruits</li>
+                    <li>Higher quality ingredients for a gourmet experience</li>
+                  </ul>
                 )}
               </div>
 
