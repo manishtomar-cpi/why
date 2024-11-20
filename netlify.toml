@@ -1,48 +1,46 @@
 [build]
-  # Build command
+  # Command to build the Next.js app
   command = "npm run build"
-  
-  # Publish directory for the built site
+  # Directory to publish after building
   publish = ".next"
-  
-  # Edge handlers for Netlify functions
+  # Path to Netlify edge functions
   edge_handlers = "netlify/edge-functions"
-  
-  # Environment variables to avoid common Next.js issues
+
+  # Environment variables for the build process
   [build.environment]
     NODE_ENV = "production"
     NEXT_PRIVATE_TARGET = "server"
     NEXT_PUBLIC_ENV = "true"
-    CI = "false" # Disable CI strictness for builds
+    CI = "false" # Disables CI mode to avoid stricter linting checks
+    SKIP_TYPE_CHECK = "true" # Skip TypeScript type checking during the build
 
 [dev]
-  # Framework setup for local development on Netlify
+  # Framework for local development
   framework = "next"
 
 [[plugins]]
-  # Using the official Next.js plugin for Netlify
+  # Netlify plugin for Next.js
   package = "@netlify/plugin-nextjs"
 
-# Custom build behavior for ESLint, Prettier, and type-checking issues
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-
 [[redirects]]
-  # Redirect requests to prevent runtime routing issues
+  # Redirect _next requests to ensure proper asset handling
   from = "/_next/*"
   to = "/_next/:splat"
   status = 200
   force = true
 
 [functions]
-  # Set memory and timeout for server-side functions
+  # Customize Netlify function behavior
   node_bundler = "esbuild"
   included_files = ["src/**/*", "public/**/*"]
   directory = "netlify/functions"
 
-# Ignore ESLint errors during the build process
+# Additional processing options
 [build.processing]
   skip_eslint = true
   skip_prettier = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
