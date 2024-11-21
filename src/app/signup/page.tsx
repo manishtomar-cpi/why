@@ -34,7 +34,7 @@ const SignupPage: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    whereStudy: '', // Renamed from 'livingPlace' to 'whereStudy'
+    whereStudy: '', // Correct field name
     age: '',
     gender: '',
     userType: '',
@@ -56,7 +56,7 @@ const SignupPage: React.FC = () => {
     address: '',
     hostelName: '',
     buildingName: '',
-    additionalDeliveryInfo: '', // New field for additional delivery information
+    additionalDeliveryInfo: '',
     city: '',
     postalCode: '',
     coordinates: [], // [longitude, latitude]
@@ -174,7 +174,7 @@ const SignupPage: React.FC = () => {
 
     // Where Study validation
     if (!formData.whereStudy) {
-      newErrors.whereStudy = 'Please select where you are living.';
+      newErrors.whereStudy = 'Please select where you are studying.';
       valid = false;
     }
 
@@ -196,7 +196,7 @@ const SignupPage: React.FC = () => {
       valid = false;
     }
 
-    // User Type-specific validations
+    // Student-specific validations
     if (formData.userType === 'student') {
       if (!formData.institutionType) {
         newErrors.institutionType = 'Please select your institution type.';
@@ -342,16 +342,12 @@ const SignupPage: React.FC = () => {
         // Extract address components
         const addressComponents = place.address_components;
         let formattedAddress = place.formatted_address || '';
-        let hostelName = '';
         let buildingName = '';
         let city = '';
         let postalCode = '';
 
         addressComponents.forEach((component) => {
           const types = component.types;
-          if (types.includes('route') || types.includes('sublocality')) {
-            // street = component.long_name;
-          }
           if (types.includes('premise') || types.includes('establishment')) {
             buildingName = component.long_name;
           }
@@ -543,7 +539,7 @@ const SignupPage: React.FC = () => {
     const userData: any = {
       firstName: formData.firstName,
       lastName: formData.lastName,
-      whereStudy: formData.whereStudy, // Renamed from 'livingPlace' to 'whereStudy'
+      whereStudy: formData.whereStudy,
       age: Number(formData.age),
       gender: formData.gender,
       userType: formData.userType,
@@ -572,7 +568,7 @@ const SignupPage: React.FC = () => {
             ? formData.hostelName
             : undefined,
         buildingName: formData.buildingName || '',
-        additionalDeliveryInfo: formData.additionalDeliveryInfo, // Ensure this is included
+        additionalDeliveryInfo: formData.additionalDeliveryInfo,
         city: formData.city,
         postalCode: formData.postalCode,
         coordinates: {
@@ -708,6 +704,7 @@ const SignupPage: React.FC = () => {
                 <option value="">Select an option</option>
                 <option value="hostel">Hostel</option>
                 <option value="pg">PG</option>
+                <option value="home">Home</option>
                 <option value="other">Other</option>
               </select>
               {errors.whereStudy && (
@@ -1098,16 +1095,19 @@ const SignupPage: React.FC = () => {
                   type="button"
                   onClick={handleSendEmailOTP}
                   disabled={sendingOTP || emailOTPVerified}
-                  className={`ml-2 mt-1 px-4 py-2 border border-primary rounded-md shadow-sm text-primary bg-white hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center ${
-                    sendingOTP || emailOTPVerified
-                      ? 'cursor-not-allowed opacity-50'
-                      : ''
-                  }`}
+                  className={`ml-2 mt-1 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
+                    emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
+                  } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
                 >
                   {sendingOTP ? (
                     <>
                       <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
                       Sending...
+                    </>
+                  ) : emailOTPVerified ? (
+                    <>
+                      <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
+                      Verified
                     </>
                   ) : (
                     'Verify'
@@ -1159,24 +1159,27 @@ const SignupPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleVerifyEmailOTP}
-                  disabled={verifyingOTP}
-                  className={`mt-4 px-4 py-2 border border-primary rounded-md shadow-sm text-primary bg-white hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center ${
-                    verifyingOTP ? 'cursor-not-allowed opacity-50' : ''
-                  }`}
+                  disabled={verifyingOTP || emailOTPVerified}
+                  className={`mt-4 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
+                    emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
+                  } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
                 >
                   {verifyingOTP ? (
                     <>
                       <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
                       Verifying...
                     </>
+                  ) : emailOTPVerified ? (
+                    <>
+                      <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
+                      Verified
+                    </>
                   ) : (
                     'Verify OTP'
                   )}
                 </button>
-                {(errors.emailOTP || errors.hostelName || errors.additionalDeliveryInfo) && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.emailOTP || errors.hostelName || errors.additionalDeliveryInfo}
-                  </p>
+                {errors.emailOTP && (
+                  <p className="text-red-500 text-xs mt-1">{errors.emailOTP}</p>
                 )}
               </div>
             )}
@@ -1279,6 +1282,85 @@ const SignupPage: React.FC = () => {
           {/* Delivery Details */}
           <div>
             <h3 className="text-xl font-semibold mb-4">Delivery Details</h3>
+            {/* Where Study */}
+            <div>
+              <label htmlFor="whereStudy" className="block text-sm font-medium text-gray-700">
+                Where are you studying?
+              </label>
+              <select
+                name="whereStudy"
+                id="whereStudy"
+                value={formData.whereStudy}
+                onChange={handleInputChange}
+                required
+                className={`mt-1 block w-full border ${
+                  errors.whereStudy ? 'border-red-500' : 'border-gray-300'
+                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+              >
+                <option value="">Select an option</option>
+                <option value="hostel">Hostel</option>
+                <option value="pg">PG</option>
+                <option value="home">Home</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.whereStudy && (
+                <p className="text-red-500 text-xs mt-1">{errors.whereStudy}</p>
+              )}
+            </div>
+
+            {/* Room Number */}
+            {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
+              <div className="mt-4">
+                <label
+                  htmlFor="roomNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Room Number
+                </label>
+                <input
+                  type="text"
+                  name="roomNumber"
+                  id="roomNumber"
+                  value={formData.roomNumber}
+                  onChange={handleInputChange}
+                  required
+                  className={`mt-1 block w-full border ${
+                    errors.roomNumber ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                />
+                {errors.roomNumber && (
+                  <p className="text-red-500 text-xs mt-1">{errors.roomNumber}</p>
+                )}
+              </div>
+            )}
+
+            {/* Hostel Name */}
+            {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
+              <div className="mt-4">
+                <label
+                  htmlFor="hostelName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Hostel Name
+                </label>
+                <input
+                  type="text"
+                  name="hostelName"
+                  id="hostelName"
+                  value={formData.hostelName}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Enter your hostel name"
+                  className={`mt-1 block w-full border ${
+                    errors.hostelName ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                />
+                {errors.hostelName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.hostelName}</p>
+                )}
+              </div>
+            )}
+
             {/* Additional Delivery Information */}
             <div className="mt-4">
               <label
