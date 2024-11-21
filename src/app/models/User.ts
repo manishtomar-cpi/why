@@ -1,32 +1,25 @@
 // src/app/models/User.ts
 
-import mongoose, { Document, Model, Schema } from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
-  role: 'student' | 'professional' | 'delivery' | 'admin';
-  userType: 'student' | 'professional';
   firstName: string;
   lastName: string;
-  whereStudy: 'hostel' | 'pg' | 'other';
   age: number;
-  gender: 'male' | 'female' | 'other';
+  gender: string;
+  userType: string;
+  institutionType: string;
+  courseName?: string;
+  courseLevel?: string;
+  classLevel?: string;
+  preparationType?: string;
+  institutionName: string;
+  companyName?: string;
+  jobTitle?: string;
   email: string;
   password: string;
   phoneNumber: string;
-  emailVerified: boolean;
-  // Student-specific fields
-  institutionType?: 'college' | 'school' | 'coaching';
-  courseName?: string;
-  courseLevel?: 'bachelor' | 'master' | 'phd';
-  classLevel?: string;
-  preparationType?: string;
-  institutionName?: string;
-  institutionOther?: string;
-  // Professional-specific fields
-  companyName?: string;
-  jobTitle?: string;
-  // Common fields
+  whereStudy: string; // Ensure this field exists
   roomNumber?: string;
   address: {
     address: string;
@@ -36,165 +29,54 @@ export interface IUser extends Document {
     city: string;
     postalCode: string;
     coordinates: {
-      type: 'Point';
-      coordinates: [number, number]; // [longitude, latitude]
+      type: string;
+      coordinates: [number, number];
     };
   };
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-const UserSchema: Schema<IUser> = new mongoose.Schema(
+const UserSchema: Schema = new mongoose.Schema(
   {
-    role: {
-      type: String,
-      enum: ['student', 'professional', 'delivery', 'admin'],
-      required: true,
-      default: 'student',
+    firstName: { type: String, required: [true, 'First name is required.'] },
+    lastName: { type: String, required: [true, 'Last name is required.'] },
+    age: { type: Number, required: [true, 'Age is required.'], min: 13 },
+    gender: { type: String, required: [true, 'Gender is required.'] },
+    userType: { type: String, required: [true, 'User type is required.'] },
+    institutionType: { type: String, required: [true, 'Institution type is required.'] },
+    courseName: { type: String },
+    courseLevel: { type: String },
+    classLevel: { type: String },
+    preparationType: { type: String },
+    institutionName: { type: String, required: [true, 'Institution name is required.'] },
+    companyName: { type: String },
+    jobTitle: { type: String },
+    email: { type: String, required: [true, 'Email is required.'], unique: true },
+    password: { type: String, required: [true, 'Password is required.'] },
+    phoneNumber: { type: String, required: [true, 'Phone number is required.'] },
+    whereStudy: { 
+      type: String, 
+      enum: ['hostel', 'pg', 'home', 'other'], 
+      required: [true, 'WhereStudy is required.'] 
     },
-    userType: {
-      type: String,
-      enum: ['student', 'professional'],
-      required: true,
-    },
-    firstName: {
-      type: String,
-      required: [true, 'Please provide your first name'],
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: [true, 'Please provide your last name'],
-      trim: true,
-    },
-    whereStudy: {
-      type: String,
-      enum: ['hostel', 'pg', 'other'],
-      required: [true, 'Please select where you are living.'],
-    },
-    age: {
-      type: Number,
-      required: [true, 'Please provide your age'],
-      min: [13, 'You must be at least 13 years old'],
-    },
-    gender: {
-      type: String,
-      enum: ['male', 'female', 'other'],
-      required: [true, 'Please select your gender'],
-    },
-    email: {
-      type: String,
-      required: [true, 'Please provide an email'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'Please provide a password'],
-      minlength: [8, 'Password must be at least 8 characters'],
-      select: false, // Exclude from queries by default
-    },
-    phoneNumber: {
-      type: String,
-      required: [true, 'Please provide a phone number'],
-      trim: true,
-    },
-    emailVerified: {
-      type: Boolean,
-      default: false,
-    },
-    // Student-specific fields
-    institutionType: {
-      type: String,
-      enum: ['college', 'school', 'coaching'],
-      required: function (this: IUser) {
-        return this.userType === 'student';
-      },
-    },
-    courseName: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'student' && this.institutionType === 'college';
-      },
-    },
-    courseLevel: {
-      type: String,
-      enum: ['bachelor', 'master', 'phd'],
-      required: function (this: IUser) {
-        return this.userType === 'student' && this.institutionType === 'college';
-      },
-    },
-    classLevel: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'student' && this.institutionType === 'school';
-      },
-    },
-    preparationType: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'student' && this.institutionType === 'coaching';
-      },
-    },
-    institutionName: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'student';
-      },
-    },
-    institutionOther: {
-      type: String,
-      required: function (this: IUser) {
-        return (
-          this.userType === 'student' &&
-          this.institutionName &&
-          this.institutionName.toLowerCase() === 'other'
-        );
-      },
-    },
-    // Professional-specific fields
-    companyName: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'professional';
-      },
-    },
-    jobTitle: {
-      type: String,
-      required: function (this: IUser) {
-        return this.userType === 'professional';
-      },
-    },
-    // Common fields
-    roomNumber: {
-      type: String,
-      required: function (this: IUser) {
-        return this.whereStudy === 'hostel' || this.whereStudy === 'pg';
-      },
-    },
+    roomNumber: { type: String },
     address: {
-      address: { type: String, required: true },
-      hostelName: {
-        type: String,
-        required: function (this: IUser) {
-          return this.whereStudy === 'hostel' || this.whereStudy === 'pg';
-        },
-      },
-      buildingName: { type: String }, // Optional
-      additionalDeliveryInfo: { type: String, required: true }, // New field
-      city: { type: String, required: true },
-      postalCode: { type: String, required: true },
+      address: { type: String, required: [true, 'Address is required.'] },
+      hostelName: { type: String },
+      buildingName: { type: String },
+      additionalDeliveryInfo: { type: String, required: [true, 'Additional delivery information is required.'] },
+      city: { type: String, required: [true, 'City is required.'] },
+      postalCode: { type: String, required: [true, 'Postal code is required.'] },
       coordinates: {
-        type: {
-          type: String,
-          enum: ['Point'],
-          default: 'Point',
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { 
+          type: [Number], 
           required: true,
-        },
-        coordinates: {
-          type: [Number], // [longitude, latitude]
-          required: true,
+          validate: {
+            validator: function(v: number[]) {
+              return v.length === 2;
+            },
+            message: props => `${props.value} is not a valid coordinate pair!`
+          }
         },
       },
     },
@@ -205,24 +87,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
   }
 );
 
-// Pre-save middleware to hash passwords
-UserSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) return next();
+// Create a 2dsphere index for geospatial queries if needed
+UserSchema.index({ 'address.coordinates': '2dsphere' });
 
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-// Method to compare passwords
-UserSchema.methods.comparePassword = async function (
-  candidatePassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Compile model if not already compiled
-const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
-
-export default User;
+export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

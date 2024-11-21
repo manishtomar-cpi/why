@@ -9,7 +9,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import {
   FaUserPlus,
   FaCheckCircle,
-  FaExclamationTriangle,
   FaEye,
   FaEyeSlash,
   FaSpinner,
@@ -31,12 +30,15 @@ const SignupPage: React.FC = () => {
     libraries: libraries as any,
   });
 
+  const [currentStep, setCurrentStep] = useState(1);
+
   const [formData, setFormData] = useState({
+    // Step 1: Basic User Details
     firstName: '',
     lastName: '',
-    whereStudy: '', // Correct field name
     age: '',
     gender: '',
+    // Step 2: User Type Details
     userType: '',
     institutionType: '',
     courseName: '',
@@ -47,16 +49,19 @@ const SignupPage: React.FC = () => {
     institutionOther: '',
     companyName: '',
     jobTitle: '',
+    // Step 3: Contact Details
     email: '',
     emailOTP: ['', '', '', '', '', ''], // For 6-digit OTP
     password: '',
     confirmPassword: '',
     phoneNumber: '',
+    // Step 4: Delivery Details
+    whereStudy: '', // Removed duplicate field
     roomNumber: '',
-    address: '',
     hostelName: '',
-    buildingName: '',
     additionalDeliveryInfo: '',
+    address: '',
+    buildingName: '',
     city: '',
     postalCode: '',
     coordinates: [], // [longitude, latitude]
@@ -155,168 +160,181 @@ const SignupPage: React.FC = () => {
     }
   };
 
-  // Validate form data
-  const validateForm = () => {
+  // Validation functions for each step
+  const validateStep = (step: number) => {
     let valid = true;
     const newErrors: any = {};
 
-    // First Name validation
-    if (!formData.firstName || formData.firstName.trim() === '') {
-      newErrors.firstName = 'Please provide your first name.';
-      valid = false;
-    }
-
-    // Last Name validation
-    if (!formData.lastName || formData.lastName.trim() === '') {
-      newErrors.lastName = 'Please provide your last name.';
-      valid = false;
-    }
-
-    // Where Study validation
-    if (!formData.whereStudy) {
-      newErrors.whereStudy = 'Please select where you are studying.';
-      valid = false;
-    }
-
-    // Age validation
-    if (!formData.age || isNaN(Number(formData.age)) || Number(formData.age) < 13) {
-      newErrors.age = 'You must be at least 13 years old.';
-      valid = false;
-    }
-
-    // Gender validation
-    if (!formData.gender) {
-      newErrors.gender = 'Please select your gender.';
-      valid = false;
-    }
-
-    // User Type validation
-    if (!formData.userType) {
-      newErrors.userType = 'Please select your user type.';
-      valid = false;
-    }
-
-    // Student-specific validations
-    if (formData.userType === 'student') {
-      if (!formData.institutionType) {
-        newErrors.institutionType = 'Please select your institution type.';
+    if (step === 1) {
+      // Step 1: Basic User Details
+      if (!formData.firstName || formData.firstName.trim() === '') {
+        newErrors.firstName = 'Please provide your first name.';
         valid = false;
-      } else {
-        if (formData.institutionType === 'college') {
-          if (!formData.courseLevel) {
-            newErrors.courseLevel = 'Please select your course level.';
-            valid = false;
-          }
-          if (!formData.courseName) {
-            newErrors.courseName = 'Please enter your course name.';
-            valid = false;
-          }
-        }
+      }
 
-        if (formData.institutionType === 'school') {
-          if (!formData.classLevel) {
-            newErrors.classLevel = 'Please select your class.';
-            valid = false;
-          }
-        }
+      if (!formData.lastName || formData.lastName.trim() === '') {
+        newErrors.lastName = 'Please provide your last name.';
+        valid = false;
+      }
 
-        if (formData.institutionType === 'coaching') {
-          if (!formData.preparationType) {
-            newErrors.preparationType = 'Please select your preparation type.';
-            valid = false;
-          }
-        }
+      if (!formData.age || isNaN(Number(formData.age)) || Number(formData.age) < 13) {
+        newErrors.age = 'You must be at least 13 years old.';
+        valid = false;
+      }
 
-        if (!formData.institutionName) {
-          newErrors.institutionName = 'Please enter your institution name.';
+      if (!formData.gender) {
+        newErrors.gender = 'Please select your gender.';
+        valid = false;
+      }
+    } else if (step === 2) {
+      // Step 2: User Type Details
+      if (!formData.userType) {
+        newErrors.userType = 'Please select your user type.';
+        valid = false;
+      }
+
+      if (formData.userType === 'student') {
+        if (!formData.institutionType) {
+          newErrors.institutionType = 'Please select your institution type.';
           valid = false;
-        } else if (
-          formData.institutionName.toLowerCase() === 'other' &&
-          !formData.institutionOther
-        ) {
-          newErrors.institutionOther = 'Please specify your institution name.';
+        } else {
+          if (formData.institutionType === 'college') {
+            if (!formData.courseLevel) {
+              newErrors.courseLevel = 'Please select your course level.';
+              valid = false;
+            }
+            if (!formData.courseName) {
+              newErrors.courseName = 'Please enter your course name.';
+              valid = false;
+            }
+          }
+
+          if (formData.institutionType === 'school') {
+            if (!formData.classLevel) {
+              newErrors.classLevel = 'Please select your class.';
+              valid = false;
+            }
+          }
+
+          if (formData.institutionType === 'coaching') {
+            if (!formData.preparationType) {
+              newErrors.preparationType = 'Please select your preparation type.';
+              valid = false;
+            }
+          }
+
+          if (!formData.institutionName) {
+            newErrors.institutionName = 'Please enter your institution name.';
+            valid = false;
+          } else if (
+            formData.institutionName.toLowerCase() === 'other' &&
+            !formData.institutionOther
+          ) {
+            newErrors.institutionOther = 'Please specify your institution name.';
+            valid = false;
+          }
+        }
+      }
+
+      if (formData.userType === 'professional') {
+        if (!formData.companyName) {
+          newErrors.companyName = 'Please enter your company name.';
+          valid = false;
+        }
+        if (!formData.jobTitle) {
+          newErrors.jobTitle = 'Please enter your job title.';
           valid = false;
         }
       }
-    }
-
-    if (formData.userType === 'professional') {
-      if (!formData.companyName) {
-        newErrors.companyName = 'Please enter your company name.';
+    } else if (step === 3) {
+      // Step 3: Contact Details
+      if (!formData.email) {
+        newErrors.email = 'Please enter your email address.';
         valid = false;
-      }
-      if (!formData.jobTitle) {
-        newErrors.jobTitle = 'Please enter your job title.';
-        valid = false;
-      }
-    }
-
-    // Email validation
-    if (!formData.email) {
-      newErrors.email = 'Please enter your email address.';
-      valid = false;
-    } else if (!EmailValidator.validate(formData.email)) {
-      newErrors.email = 'Invalid email address.';
-      valid = false;
-    }
-
-    // Password validation
-    if (!formData.password || formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long.';
-      valid = false;
-    }
-
-    // Confirm password
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match.';
-      valid = false;
-    }
-
-    // Phone number validation
-    if (!formData.phoneNumber) {
-      newErrors.phoneNumber = 'Please enter your phone number.';
-      valid = false;
-    } else if (!isValidPhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Invalid phone number.';
-      valid = false;
-    }
-
-    // Address validation
-    if (!formData.address) {
-      newErrors.address = 'Please provide your address.';
-      valid = false;
-    } else {
-      if (!formData.city) {
-        newErrors.city = 'Please provide your city.';
-        valid = false;
-      }
-      if (!formData.postalCode) {
-        newErrors.postalCode = 'Please provide your postal code.';
-        valid = false;
-      }
-      if (!formData.coordinates || formData.coordinates.length !== 2) {
-        newErrors.coordinates = 'Invalid address coordinates.';
+      } else if (!EmailValidator.validate(formData.email)) {
+        newErrors.email = 'Invalid email address.';
         valid = false;
       }
 
-      // If whereStudy is hostel or pg, and hostelName is missing
-      if (
-        (formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') &&
-        !formData.hostelName
-      ) {
-        newErrors.hostelName = 'Please provide your hostel name.';
+      if (!emailOTPVerified) {
+        newErrors.emailOTP = 'Please verify your email.';
         valid = false;
       }
 
-      // Additional delivery information validation
+      if (!formData.password || formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters long.';
+        valid = false;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match.';
+        valid = false;
+      }
+
+      if (!formData.phoneNumber) {
+        newErrors.phoneNumber = 'Please enter your phone number.';
+        valid = false;
+      } else if (!isValidPhoneNumber(formData.phoneNumber)) {
+        newErrors.phoneNumber = 'Invalid phone number.';
+        valid = false;
+      }
+    } else if (step === 4) {
+      // Step 4: Delivery Details
+      if (!formData.whereStudy) {
+        newErrors.whereStudy = 'Please select where you are living.';
+        valid = false;
+      }
+
+      if (formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') {
+        if (!formData.roomNumber) {
+          newErrors.roomNumber = 'Please enter your room number.';
+          valid = false;
+        }
+
+        if (!formData.hostelName) {
+          newErrors.hostelName = 'Please provide your hostel name.';
+          valid = false;
+        }
+      }
+
       if (!formData.additionalDeliveryInfo) {
         newErrors.additionalDeliveryInfo = 'Please provide additional delivery information.';
         valid = false;
+      }
+
+      if (!formData.address) {
+        newErrors.address = 'Please provide your address.';
+        valid = false;
+      } else {
+        if (!formData.city) {
+          newErrors.city = 'Please provide your city.';
+          valid = false;
+        }
+        if (!formData.postalCode) {
+          newErrors.postalCode = 'Please provide your postal code.';
+          valid = false;
+        }
+        if (!formData.coordinates || formData.coordinates.length !== 2) {
+          newErrors.coordinates = 'Invalid address coordinates.';
+          valid = false;
+        }
       }
     }
 
     setErrors(newErrors);
     return valid;
+  };
+
+  // Navigate to the next step
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+
+  // Navigate to the previous step
+  const handleBack = () => {
+    setCurrentStep((prev) => prev - 1);
   };
 
   // Address Autocomplete
@@ -529,7 +547,14 @@ const SignupPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    // Validate the current step
+    if (!validateStep(currentStep)) {
+      return;
+    }
+
+    // If not on the summary step, proceed to the next step
+    if (currentStep < 5) {
+      setCurrentStep((prev) => prev + 1);
       return;
     }
 
@@ -539,7 +564,6 @@ const SignupPage: React.FC = () => {
     const userData: any = {
       firstName: formData.firstName,
       lastName: formData.lastName,
-      whereStudy: formData.whereStudy,
       age: Number(formData.age),
       gender: formData.gender,
       userType: formData.userType,
@@ -557,12 +581,13 @@ const SignupPage: React.FC = () => {
       email: formData.email,
       password: formData.password,
       phoneNumber: formData.phoneNumber,
+      whereStudy: formData.whereStudy, // **Include whereStudy here**
       roomNumber:
         formData.whereStudy === 'hostel' || formData.whereStudy === 'pg'
           ? formData.roomNumber
           : undefined,
       address: {
-        address: formData.address,
+        address: formData.address, // Store the full formatted address
         hostelName:
           formData.whereStudy === 'hostel' || formData.whereStudy === 'pg'
             ? formData.hostelName
@@ -578,9 +603,10 @@ const SignupPage: React.FC = () => {
       },
     };
 
+    console.log('Submitting userData:', userData); // For debugging
+
     try {
       const response = await axios.post('/api/auth/signup', userData);
-
       if (response.data.success) {
         toast.success('You have successfully registered.', { position: 'top-right' });
         // Redirect after a short delay
@@ -638,898 +664,1180 @@ const SignupPage: React.FC = () => {
         <h2 className="text-3xl font-bold mb-6 text-center text-primary">
           Create Your Account
         </h2>
+        {/* Stepper */}
+        <div className="flex justify-between mb-6">
+          <div
+            className={`flex items-center ${currentStep >= 1 ? 'text-primary' : 'text-gray-400'}`}
+            onClick={() => currentStep > 1 && setCurrentStep(1)}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
+              } cursor-pointer`}
+            >
+              1
+            </div>
+            <span className="ml-2 text-sm">Basic Details</span>
+          </div>
+          <div
+            className={`flex items-center ${currentStep >= 2 ? 'text-primary' : 'text-gray-400'}`}
+            onClick={() => currentStep > 2 && setCurrentStep(2)}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
+              } cursor-pointer`}
+            >
+              2
+            </div>
+            <span className="ml-2 text-sm">User Type</span>
+          </div>
+          <div
+            className={`flex items-center ${currentStep >= 3 ? 'text-primary' : 'text-gray-400'}`}
+            onClick={() => currentStep > 3 && setCurrentStep(3)}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
+              } cursor-pointer`}
+            >
+              3
+            </div>
+            <span className="ml-2 text-sm">Contact</span>
+          </div>
+          <div
+            className={`flex items-center ${currentStep >= 4 ? 'text-primary' : 'text-gray-400'}`}
+            onClick={() => currentStep > 4 && setCurrentStep(4)}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep >= 4 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
+              } cursor-pointer`}
+            >
+              4
+            </div>
+            <span className="ml-2 text-sm">Delivery</span>
+          </div>
+          <div
+            className={`flex items-center ${currentStep >= 5 ? 'text-primary' : 'text-gray-400'}`}
+            onClick={() => currentStep > 5 && setCurrentStep(5)}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep >= 5 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
+              } cursor-pointer`}
+            >
+              5
+            </div>
+            <span className="ml-2 text-sm">Summary</span>
+          </div>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic User Details */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Basic Details</h3>
-            {/* First Name */}
+          {/* Step 1: Basic User Details */}
+          {currentStep === 1 && (
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                id="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                required
-                placeholder="First Name"
-                className={`mt-1 block w-full border ${
-                  errors.firstName ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
-              )}
-            </div>
-
-            {/* Last Name */}
-            <div className="mt-4">
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                id="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                required
-                placeholder="Last Name"
-                className={`mt-1 block w-full border ${
-                  errors.lastName ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
-              )}
-            </div>
-
-            {/* Where Study */}
-            <div className="mt-4">
-              <label htmlFor="whereStudy" className="block text-sm font-medium text-gray-700">
-                Where are you Living?
-              </label>
-              <select
-                name="whereStudy"
-                id="whereStudy"
-                value={formData.whereStudy}
-                onChange={handleInputChange}
-                required
-                className={`mt-1 block w-full border ${
-                  errors.whereStudy ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              >
-                <option value="">Select an option</option>
-                <option value="hostel">Hostel</option>
-                <option value="pg">PG</option>
-                <option value="home">Home</option>
-                <option value="other">Other</option>
-              </select>
-              {errors.whereStudy && (
-                <p className="text-red-500 text-xs mt-1">{errors.whereStudy}</p>
-              )}
-            </div>
-
-            {/* Age and Gender */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              {/* Age */}
+              <h3 className="text-xl font-semibold mb-4">Basic Details</h3>
+              {/* First Name */}
               <div>
-                <label htmlFor="age" className="block text-sm font-medium text-gray-700">
-                  Age
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                  First Name
                 </label>
                 <input
-                  type="number"
-                  name="age"
-                  id="age"
-                  value={formData.age}
+                  type="text"
+                  name="firstName"
+                  id="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
                   required
-                  min={13}
+                  placeholder="First Name"
                   className={`mt-1 block w-full border ${
-                    errors.age ? 'border-red-500' : 'border-gray-300'
+                    errors.firstName ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                 />
-                {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
-              </div>
-
-              {/* Gender */}
-              <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                  Gender
-                </label>
-                <select
-                  name="gender"
-                  id="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.gender ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-                {errors.gender && (
-                  <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+                {errors.firstName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* Core User Type */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">User Type</h3>
-            <div>
-              <label htmlFor="userType" className="block text-sm font-medium text-gray-700">
-                Are you a Student or a Working Professional?
-              </label>
-              <select
-                name="userType"
-                id="userType"
-                value={formData.userType}
-                onChange={handleInputChange}
-                required
-                className={`mt-1 block w-full border ${
-                  errors.userType ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              >
-                <option value="">Select User Type</option>
-                <option value="student">Student</option>
-                <option value="professional">Working Professional</option>
-              </select>
-              {errors.userType && (
-                <p className="text-red-500 text-xs mt-1">{errors.userType}</p>
-              )}
-            </div>
-
-            {/* Student Details */}
-            {formData.userType === 'student' && (
+              {/* Last Name */}
               <div className="mt-4">
-                {/* Institution Type */}
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Last Name"
+                  className={`mt-1 block w-full border ${
+                    errors.lastName ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                />
+                {errors.lastName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+                )}
+              </div>
+
+              {/* Age and Gender */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                {/* Age */}
                 <div>
-                  <label
-                    htmlFor="institutionType"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Institution Type
+                  <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    name="age"
+                    id="age"
+                    value={formData.age}
+                    onChange={handleInputChange}
+                    required
+                    min={13}
+                    className={`mt-1 block w-full border ${
+                      errors.age ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                    Gender
                   </label>
                   <select
-                    name="institutionType"
-                    id="institutionType"
-                    value={formData.institutionType}
+                    name="gender"
+                    id="gender"
+                    value={formData.gender}
                     onChange={handleInputChange}
                     required
                     className={`mt-1 block w-full border ${
-                      errors.institutionType ? 'border-red-500' : 'border-gray-300'
+                      errors.gender ? 'border-red-500' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                   >
-                    <option value="">Select Institution Type</option>
-                    <option value="college">College</option>
-                    <option value="school">School</option>
-                    <option value="coaching">Coaching</option>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
                   </select>
-                  {errors.institutionType && (
-                    <p className="text-red-500 text-xs mt-1">{errors.institutionType}</p>
+                  {errors.gender && (
+                    <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
                   )}
                 </div>
+              </div>
 
-                {/* Conditional Fields Based on Institution Type */}
-                {formData.institutionType === 'college' && (
-                  <>
-                    {/* Course Level */}
+              {/* Next Button */}
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: User Type Details */}
+          {currentStep === 2 && (
+            <div>
+              <h3 className="text-xl font-semibold mb-4">User Type</h3>
+              {/* User Type */}
+              <div>
+                <label htmlFor="userType" className="block text-sm font-medium text-gray-700">
+                  Are you a Student or a Working Professional?
+                </label>
+                <select
+                  name="userType"
+                  id="userType"
+                  value={formData.userType}
+                  onChange={handleInputChange}
+                  required
+                  className={`mt-1 block w-full border ${
+                    errors.userType ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                >
+                  <option value="">Select User Type</option>
+                  <option value="student">Student</option>
+                  <option value="professional">Working Professional</option>
+                </select>
+                {errors.userType && (
+                  <p className="text-red-500 text-xs mt-1">{errors.userType}</p>
+                )}
+              </div>
+
+              {/* Student Details */}
+              {formData.userType === 'student' && (
+                <div className="mt-4">
+                  {/* Institution Type */}
+                  <div>
+                    <label
+                      htmlFor="institutionType"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Institution Type
+                    </label>
+                    <select
+                      name="institutionType"
+                      id="institutionType"
+                      value={formData.institutionType}
+                      onChange={handleInputChange}
+                      required
+                      className={`mt-1 block w-full border ${
+                        errors.institutionType ? 'border-red-500' : 'border-gray-300'
+                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                    >
+                      <option value="">Select Institution Type</option>
+                      <option value="college">College</option>
+                      <option value="school">School</option>
+                      <option value="coaching">Coaching</option>
+                    </select>
+                    {errors.institutionType && (
+                      <p className="text-red-500 text-xs mt-1">{errors.institutionType}</p>
+                    )}
+                  </div>
+
+                  {/* Conditional Fields Based on Institution Type */}
+                  {formData.institutionType === 'college' && (
+                    <>
+                      {/* Course Level */}
+                      <div className="mt-4">
+                        <label
+                          htmlFor="courseLevel"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Course Level
+                        </label>
+                        <select
+                          name="courseLevel"
+                          id="courseLevel"
+                          value={formData.courseLevel}
+                          onChange={handleInputChange}
+                          required
+                          className={`mt-1 block w-full border ${
+                            errors.courseLevel ? 'border-red-500' : 'border-gray-300'
+                          } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                        >
+                          <option value="">Select Course Level</option>
+                          <option value="bachelor">Bachelor's Degree</option>
+                          <option value="master">Master's Degree</option>
+                          <option value="phd">PhD</option>
+                        </select>
+                        {errors.courseLevel && (
+                          <p className="text-red-500 text-xs mt-1">{errors.courseLevel}</p>
+                        )}
+                      </div>
+
+                      {/* Course Name */}
+                      <div className="mt-4">
+                        <label
+                          htmlFor="courseName"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Course Name
+                        </label>
+                        <input
+                          type="text"
+                          name="courseName"
+                          id="courseName"
+                          value={formData.courseName}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="e.g., Computer Science"
+                          className={`mt-1 block w-full border ${
+                            errors.courseName ? 'border-red-500' : 'border-gray-300'
+                          } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                        />
+                        {errors.courseName && (
+                          <p className="text-red-500 text-xs mt-1">{errors.courseName}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {formData.institutionType === 'school' && (
                     <div className="mt-4">
+                      {/* Class Level */}
                       <label
-                        htmlFor="courseLevel"
+                        htmlFor="classLevel"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Course Level
+                        Class
                       </label>
                       <select
-                        name="courseLevel"
-                        id="courseLevel"
-                        value={formData.courseLevel}
+                        name="classLevel"
+                        id="classLevel"
+                        value={formData.classLevel}
                         onChange={handleInputChange}
                         required
                         className={`mt-1 block w-full border ${
-                          errors.courseLevel ? 'border-red-500' : 'border-gray-300'
+                          errors.classLevel ? 'border-red-500' : 'border-gray-300'
                         } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                       >
-                        <option value="">Select Course Level</option>
-                        <option value="bachelor">Bachelor's Degree</option>
-                        <option value="master">Master's Degree</option>
-                        <option value="phd">PhD</option>
+                        <option value="">Select Class</option>
+                        {[...Array(12)].map((_, index) => (
+                          <option key={index} value={`Class ${index + 1}`}>
+                            Class {index + 1}
+                          </option>
+                        ))}
                       </select>
-                      {errors.courseLevel && (
-                        <p className="text-red-500 text-xs mt-1">{errors.courseLevel}</p>
+                      {errors.classLevel && (
+                        <p className="text-red-500 text-xs mt-1">{errors.classLevel}</p>
                       )}
                     </div>
+                  )}
 
-                    {/* Course Name */}
+                  {formData.institutionType === 'coaching' && (
                     <div className="mt-4">
+                      {/* Preparation Type */}
                       <label
-                        htmlFor="courseName"
+                        htmlFor="preparationType"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Course Name
+                        Preparation For
+                      </label>
+                      <select
+                        name="preparationType"
+                        id="preparationType"
+                        value={formData.preparationType}
+                        onChange={handleInputChange}
+                        required
+                        className={`mt-1 block w-full border ${
+                          errors.preparationType ? 'border-red-500' : 'border-gray-300'
+                        } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                      >
+                        <option value="">Select Preparation Type</option>
+                        <option value="engineering">Engineering Entrance Exams</option>
+                        <option value="medical">Medical Entrance Exams</option>
+                        <option value="civil_services">Civil Services</option>
+                        <option value="other">Other</option>
+                      </select>
+                      {errors.preparationType && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.preparationType}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Institution Name */}
+                  <div className="mt-4">
+                    <label
+                      htmlFor="institutionName"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Institution Name
+                    </label>
+                    <Autocomplete
+                      onLoad={onLoadInstitution}
+                      onPlaceChanged={onPlaceChangedInstitution}
+                      options={{
+                        types: ['establishment'],
+                        componentRestrictions: { country: 'in' },
+                      }}
+                    >
+                      <input
+                        type="text"
+                        name="institutionName"
+                        id="institutionName"
+                        value={formData.institutionName}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Search your institution"
+                        className={`mt-1 block w-full border ${
+                          errors.institutionName ? 'border-red-500' : 'border-gray-300'
+                        } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                      />
+                    </Autocomplete>
+                    {errors.institutionName && (
+                      <p className="text-red-500 text-xs mt-1">{errors.institutionName}</p>
+                    )}
+                  </div>
+
+                  {/* If 'Other' is selected */}
+                  {formData.institutionName.toLowerCase() === 'other' && (
+                    <div className="mt-4">
+                      <label
+                        htmlFor="institutionOther"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Specify Institution
                       </label>
                       <input
                         type="text"
-                        name="courseName"
-                        id="courseName"
-                        value={formData.courseName}
+                        name="institutionOther"
+                        id="institutionOther"
+                        value={formData.institutionOther}
                         onChange={handleInputChange}
                         required
-                        placeholder="e.g., Computer Science"
+                        placeholder="Enter your institution name"
                         className={`mt-1 block w-full border ${
-                          errors.courseName ? 'border-red-500' : 'border-gray-300'
+                          errors.institutionOther ? 'border-red-500' : 'border-gray-300'
                         } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                       />
-                      {errors.courseName && (
-                        <p className="text-red-500 text-xs mt-1">{errors.courseName}</p>
+                      {errors.institutionOther && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.institutionOther}
+                        </p>
                       )}
                     </div>
-                  </>
-                )}
-
-                {formData.institutionType === 'school' && (
-                  <div className="mt-4">
-                    {/* Class Level */}
-                    <label
-                      htmlFor="classLevel"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Class
-                    </label>
-                    <select
-                      name="classLevel"
-                      id="classLevel"
-                      value={formData.classLevel}
-                      onChange={handleInputChange}
-                      required
-                      className={`mt-1 block w-full border ${
-                        errors.classLevel ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                    >
-                      <option value="">Select Class</option>
-                      {[...Array(12)].map((_, index) => (
-                        <option key={index} value={`Class ${index + 1}`}>
-                          Class {index + 1}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.classLevel && (
-                      <p className="text-red-500 text-xs mt-1">{errors.classLevel}</p>
-                    )}
-                  </div>
-                )}
-
-                {formData.institutionType === 'coaching' && (
-                  <div className="mt-4">
-                    {/* Preparation Type */}
-                    <label
-                      htmlFor="preparationType"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Preparation For
-                    </label>
-                    <select
-                      name="preparationType"
-                      id="preparationType"
-                      value={formData.preparationType}
-                      onChange={handleInputChange}
-                      required
-                      className={`mt-1 block w-full border ${
-                        errors.preparationType ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                    >
-                      <option value="">Select Preparation Type</option>
-                      <option value="engineering">Engineering Entrance Exams</option>
-                      <option value="medical">Medical Entrance Exams</option>
-                      <option value="civil_services">Civil Services</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {errors.preparationType && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.preparationType}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Institution Name */}
-                <div className="mt-4">
-                  <label
-                    htmlFor="institutionName"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Institution Name
-                  </label>
-                  <Autocomplete
-                    onLoad={onLoadInstitution}
-                    onPlaceChanged={onPlaceChangedInstitution}
-                    options={{
-                      types: ['establishment'],
-                      componentRestrictions: { country: 'in' },
-                    }}
-                  >
-                    <input
-                      type="text"
-                      name="institutionName"
-                      id="institutionName"
-                      value={formData.institutionName}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Search your institution"
-                      className={`mt-1 block w-full border ${
-                        errors.institutionName ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                    />
-                  </Autocomplete>
-                  {errors.institutionName && (
-                    <p className="text-red-500 text-xs mt-1">{errors.institutionName}</p>
                   )}
                 </div>
+              )}
 
-                {/* If 'Other' is selected */}
-                {formData.institutionName.toLowerCase() === 'other' && (
-                  <div className="mt-4">
+              {/* Working Professional Details */}
+              {formData.userType === 'professional' && (
+                <div className="mt-4">
+                  {/* Company Name */}
+                  <div>
                     <label
-                      htmlFor="institutionOther"
+                      htmlFor="companyName"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Specify Institution
+                      Company Name
+                    </label>
+                    <Autocomplete
+                      onLoad={onLoadCompany}
+                      onPlaceChanged={onPlaceChangedCompany}
+                      options={{
+                        types: ['establishment'],
+                        componentRestrictions: { country: 'in' },
+                      }}
+                    >
+                      <input
+                        type="text"
+                        name="companyName"
+                        id="companyName"
+                        value={formData.companyName}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Search your company"
+                        className={`mt-1 block w-full border ${
+                          errors.companyName ? 'border-red-500' : 'border-gray-300'
+                        } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                      />
+                    </Autocomplete>
+                    {errors.companyName && (
+                      <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>
+                    )}
+                  </div>
+
+                  {/* Job Title */}
+                  <div className="mt-4">
+                    <label
+                      htmlFor="jobTitle"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Job Title
                     </label>
                     <input
                       type="text"
-                      name="institutionOther"
-                      id="institutionOther"
-                      value={formData.institutionOther}
+                      name="jobTitle"
+                      id="jobTitle"
+                      value={formData.jobTitle}
                       onChange={handleInputChange}
                       required
-                      placeholder="Enter your institution name"
                       className={`mt-1 block w-full border ${
-                        errors.institutionOther ? 'border-red-500' : 'border-gray-300'
+                        errors.jobTitle ? 'border-red-500' : 'border-gray-300'
                       } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                     />
-                    {errors.institutionOther && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.institutionOther}
-                      </p>
+                    {errors.jobTitle && (
+                      <p className="text-red-500 text-xs mt-1">{errors.jobTitle}</p>
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="mt-6 flex justify-between">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Contact Details */}
+          {currentStep === 3 && (
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Contact Details</h3>
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <div className="flex">
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    disabled={emailOTPVerified}
+                    required
+                    className={`mt-1 block w-full border ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendEmailOTP}
+                    disabled={sendingOTP || emailOTPVerified}
+                    className={`ml-2 mt-1 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
+                      emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
+                    } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
+                  >
+                    {sendingOTP ? (
+                      <>
+                        <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
+                        Sending...
+                      </>
+                    ) : emailOTPVerified ? (
+                      <>
+                        <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
+                        Verified
+                      </>
+                    ) : (
+                      'Verify'
+                    )}
+                  </button>
+                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
                 )}
               </div>
-            )}
 
-            {/* Working Professional Details */}
-            {formData.userType === 'professional' && (
-              <div className="mt-4">
-                {/* Company Name */}
-                <div>
-                  <label
-                    htmlFor="companyName"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company Name
+              {/* Email OTP */}
+              {emailOTPRequested && !emailOTPVerified && (
+                <div className="mt-4">
+                  <label htmlFor="emailOTP" className="block text-sm font-medium text-gray-700">
+                    Enter OTP
                   </label>
-                  <Autocomplete
-                    onLoad={onLoadCompany}
-                    onPlaceChanged={onPlaceChangedCompany}
-                    options={{
-                      types: ['establishment'],
-                      componentRestrictions: { country: 'in' },
-                    }}
+                  <div className="flex space-x-2">
+                    {formData.emailOTP.map((digit, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        name={`otp-${index}`}
+                        id={`otp-${index}`}
+                        value={digit}
+                        onChange={(e) => handleOTPChange(e, index)}
+                        onPaste={handleOTPPaste}
+                        maxLength={1}
+                        ref={(el) => {
+                          if (el) {
+                            otpRefs.current[index] = el;
+                          }
+                        }}
+                        className={`w-12 h-12 text-center border ${
+                          errors.emailOTP || errors[`otp-${index}`]
+                            ? 'border-red-500'
+                            : 'border-gray-300'
+                        } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none text-lg`}
+                        onKeyDown={(e) => {
+                          if (e.key === 'ArrowLeft' && index > 0) {
+                            otpRefs.current[index - 1]?.focus();
+                          } else if (e.key === 'ArrowRight' && index < 5) {
+                            otpRefs.current[index + 1]?.focus();
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleVerifyEmailOTP}
+                    disabled={verifyingOTP || emailOTPVerified}
+                    className={`mt-4 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
+                      emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
+                    } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
                   >
-                    <input
-                      type="text"
-                      name="companyName"
-                      id="companyName"
-                      value={formData.companyName}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Search your company"
-                      className={`mt-1 block w-full border ${
-                        errors.companyName ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                    />
-                  </Autocomplete>
-                  {errors.companyName && (
-                    <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>
+                    {verifyingOTP ? (
+                      <>
+                        <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
+                        Verifying...
+                      </>
+                    ) : emailOTPVerified ? (
+                      <>
+                        <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
+                        Verified
+                      </>
+                    ) : (
+                      'Verify OTP'
+                    )}
+                  </button>
+                  {errors.emailOTP && (
+                    <p className="text-red-500 text-xs mt-1">{errors.emailOTP}</p>
                   )}
                 </div>
+              )}
 
-                {/* Job Title */}
-                <div className="mt-4">
-                  <label
-                    htmlFor="jobTitle"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Job Title
-                  </label>
+              {/* Password */}
+              <div className="mt-4">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
                   <input
-                    type="text"
-                    name="jobTitle"
-                    id="jobTitle"
-                    value={formData.jobTitle}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    id="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Minimum 8 characters with letters and numbers"
+                    className={`mt-1 block w-full border ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="text-gray-500" />
+                    ) : (
+                      <FaEye className="text-gray-500" />
+                    )}
+                  </div>
+                </div>
+                <PasswordStrengthBar password={formData.password} />
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="mt-4">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    value={formData.confirmPassword}
                     onChange={handleInputChange}
                     required
                     className={`mt-1 block w-full border ${
-                      errors.jobTitle ? 'border-red-500' : 'border-gray-300'
+                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                   />
-                  {errors.jobTitle && (
-                    <p className="text-red-500 text-xs mt-1">{errors.jobTitle}</p>
-                  )}
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <FaEyeSlash className="text-gray-500" />
+                    ) : (
+                      <FaEye className="text-gray-500" />
+                    )}
+                  </div>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Contact Details */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Contact Details</h3>
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <div className="flex">
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={emailOTPVerified}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
+              {/* Phone Number */}
+              <div className="mt-4">
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+                <PhoneInput
+                  country={'in'}
+                  value={formData.phoneNumber}
+                  onChange={handlePhoneChange}
+                  inputProps={{
+                    name: 'phoneNumber',
+                    required: true,
+                    autoFocus: false,
+                  }}
+                  inputClass={`mt-1 block w-full border ${
+                    errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
                 />
+                {errors.phoneNumber && (
+                  <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
+                )}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="mt-6 flex justify-between">
                 <button
                   type="button"
-                  onClick={handleSendEmailOTP}
-                  disabled={sendingOTP || emailOTPVerified}
-                  className={`ml-2 mt-1 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
-                    emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
-                  } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
+                  onClick={handleBack}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
                 >
-                  {sendingOTP ? (
-                    <>
-                      <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
-                      Sending...
-                    </>
-                  ) : emailOTPVerified ? (
-                    <>
-                      <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
-                      Verified
-                    </>
-                  ) : (
-                    'Verify'
-                  )}
+                  Back
                 </button>
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Email OTP */}
-            {emailOTPRequested && !emailOTPVerified && (
-              <div className="mt-4">
-                <label htmlFor="emailOTP" className="block text-sm font-medium text-gray-700">
-                  Enter OTP
-                </label>
-                <div className="flex space-x-2">
-                  {formData.emailOTP.map((digit, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      name={`otp-${index}`}
-                      id={`otp-${index}`}
-                      value={digit}
-                      onChange={(e) => handleOTPChange(e, index)}
-                      onPaste={handleOTPPaste}
-                      maxLength={1}
-                      ref={(el) => {
-                        if (el) {
-                          otpRefs.current[index] = el;
-                        }
-                      }}
-                      className={`w-12 h-12 text-center border ${
-                        errors.emailOTP || errors[`otp-${index}`]
-                          ? 'border-red-500'
-                          : 'border-gray-300'
-                      } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none text-lg`}
-                      onKeyDown={(e) => {
-                        if (e.key === 'ArrowLeft' && index > 0) {
-                          otpRefs.current[index - 1]?.focus();
-                        } else if (e.key === 'ArrowRight' && index < 5) {
-                          otpRefs.current[index + 1]?.focus();
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
                 <button
                   type="button"
-                  onClick={handleVerifyEmailOTP}
-                  disabled={verifyingOTP || emailOTPVerified}
-                  className={`mt-4 px-4 py-2 border border-primary rounded-md shadow-sm text-primary ${
-                    emailOTPVerified ? 'bg-gray-400 cursor-not-allowed' : 'bg-white'
-                  } hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center justify-center`}
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  {verifyingOTP ? (
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Delivery Details */}
+          {currentStep === 4 && (
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Delivery Details</h3>
+              {/* Where Study */}
+              <div>
+                <label htmlFor="whereStudy" className="block text-sm font-medium text-gray-700">
+                  Where are you living?
+                </label>
+                <select
+                  name="whereStudy"
+                  id="whereStudy"
+                  value={formData.whereStudy}
+                  onChange={handleInputChange}
+                  required
+                  className={`mt-1 block w-full border ${
+                    errors.whereStudy ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                >
+                  <option value="">Select an option</option>
+                  <option value="hostel">Hostel</option>
+                  <option value="pg">PG</option>
+                  <option value="home">Home</option>
+                  <option value="other">Other</option>
+                </select>
+                {errors.whereStudy && (
+                  <p className="text-red-500 text-xs mt-1">{errors.whereStudy}</p>
+                )}
+              </div>
+
+              {/* Room Number */}
+              {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
+                <div className="mt-4">
+                  <label
+                    htmlFor="roomNumber"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Room Number
+                  </label>
+                  <input
+                    type="text"
+                    name="roomNumber"
+                    id="roomNumber"
+                    value={formData.roomNumber}
+                    onChange={handleInputChange}
+                    required
+                    className={`mt-1 block w-full border ${
+                      errors.roomNumber ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  {errors.roomNumber && (
+                    <p className="text-red-500 text-xs mt-1">{errors.roomNumber}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Hostel Name */}
+              {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
+                <div className="mt-4">
+                  <label
+                    htmlFor="hostelName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Hostel Name
+                  </label>
+                  <input
+                    type="text"
+                    name="hostelName"
+                    id="hostelName"
+                    value={formData.hostelName}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter your hostel name"
+                    className={`mt-1 block w-full border ${
+                      errors.hostelName ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  {errors.hostelName && (
+                    <p className="text-red-500 text-xs mt-1">{errors.hostelName}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Additional Delivery Information */}
+              <div className="mt-4">
+                <label
+                  htmlFor="additionalDeliveryInfo"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Additional Delivery Information
+                </label>
+                <textarea
+                  name="additionalDeliveryInfo"
+                  id="additionalDeliveryInfo"
+                  value={formData.additionalDeliveryInfo}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Any additional information for delivery (e.g., landmarks, instructions)"
+                  className={`mt-1 block w-full border ${
+                    errors.additionalDeliveryInfo ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                ></textarea>
+                {errors.additionalDeliveryInfo && (
+                  <p className="text-red-500 text-xs mt-1">{errors.additionalDeliveryInfo}</p>
+                )}
+              </div>
+
+              {/* Address */}
+              <div className="mt-4">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                  Address
+                </label>
+                <Autocomplete
+                  onLoad={onLoadAddress}
+                  onPlaceChanged={onPlaceChangedAddress}
+                  options={{
+                    types: ['establishment', 'geocode'], // Prioritize establishments and geocodes
+                    componentRestrictions: { country: 'in' },
+                  }}
+                >
+                  <input
+                    type="text"
+                    name="address"
+                    id="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Search your address"
+                    className={`mt-1 block w-full border ${
+                      errors.address ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                </Autocomplete>
+                {errors.address && (
+                  <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                )}
+              </div>
+
+              {/* Building Name */}
+              <div className="mt-4">
+                <label htmlFor="buildingName" className="block text-sm font-medium text-gray-700">
+                  Building Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="buildingName"
+                  id="buildingName"
+                  value={formData.buildingName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your building name"
+                  className={`mt-1 block w-full border ${
+                    errors.buildingName ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                />
+                {errors.buildingName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.buildingName}</p>
+                )}
+              </div>
+
+              {/* City and Postal Code */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                {/* City */}
+                <div>
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    id="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    required
+                    className={`mt-1 block w-full border ${
+                      errors.city ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                </div>
+
+                {/* Postal Code */}
+                <div>
+                  <label
+                    htmlFor="postalCode"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Postal Code
+                  </label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    id="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    required
+                    className={`mt-1 block w-full border ${
+                      errors.postalCode ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
+                  />
+                  {errors.postalCode && (
+                    <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="mt-6 flex justify-between">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Summary & Submission */}
+          {currentStep === 5 && (
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Summary</h3>
+              <div className="space-y-4">
+                {/* Basic Details */}
+                <div className="border p-4 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">Basic Details</h4>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(1)}
+                      className="text-primary hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p>
+                    <strong>First Name:</strong> {formData.firstName}
+                  </p>
+                  <p>
+                    <strong>Last Name:</strong> {formData.lastName}
+                  </p>
+                  <p>
+                    <strong>Age:</strong> {formData.age}
+                  </p>
+                  <p>
+                    <strong>Gender:</strong> {formData.gender.charAt(0).toUpperCase() + formData.gender.slice(1)}
+                  </p>
+                </div>
+
+                {/* User Type Details */}
+                <div className="border p-4 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">User Type Details</h4>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(2)}
+                      className="text-primary hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p>
+                    <strong>User Type:</strong> {formData.userType === 'student' ? 'Student' : 'Working Professional'}
+                  </p>
+                  {formData.userType === 'student' && (
                     <>
-                      <FaSpinner className="animate-spin h-5 w-5 mr-2 text-primary" />
-                      Verifying...
+                      <p>
+                        <strong>Institution Type:</strong> {formData.institutionType.charAt(0).toUpperCase() + formData.institutionType.slice(1)}
+                      </p>
+                      {formData.institutionType === 'college' && (
+                        <>
+                          <p>
+                            <strong>Course Level:</strong> {formData.courseLevel.charAt(0).toUpperCase() + formData.courseLevel.slice(1)}
+                          </p>
+                          <p>
+                            <strong>Course Name:</strong> {formData.courseName}
+                          </p>
+                        </>
+                      )}
+                      {formData.institutionType === 'school' && (
+                        <p>
+                          <strong>Class Level:</strong> {formData.classLevel}
+                        </p>
+                      )}
+                      {formData.institutionType === 'coaching' && (
+                        <p>
+                          <strong>Preparation Type:</strong> {formData.preparationType}
+                        </p>
+                      )}
+                      <p>
+                        <strong>Institution Name:</strong> {formData.institutionName}
+                      </p>
+                      {formData.institutionName.toLowerCase() === 'other' && (
+                        <p>
+                          <strong>Specified Institution:</strong> {formData.institutionOther}
+                        </p>
+                      )}
                     </>
-                  ) : emailOTPVerified ? (
+                  )}
+                  {formData.userType === 'professional' && (
                     <>
-                      <FaCheckCircle className="h-5 w-5 mr-2 text-green-500" />
-                      Verified
+                      <p>
+                        <strong>Company Name:</strong> {formData.companyName}
+                      </p>
+                      <p>
+                        <strong>Job Title:</strong> {formData.jobTitle}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Contact Details */}
+                <div className="border p-4 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">Contact Details</h4>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      className="text-primary hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p>
+                    <strong>Email:</strong> {formData.email}
+                  </p>
+                  <p>
+                    <strong>Email Verified:</strong> {emailOTPVerified ? 'Yes' : 'No'}
+                  </p>
+                  <p>
+                    <strong>Phone Number:</strong> {formData.phoneNumber}
+                  </p>
+                </div>
+
+                {/* Delivery Details */}
+                <div className="border p-4 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">Delivery Details</h4>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(4)}
+                      className="text-primary hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p>
+                    <strong>Where are you living:</strong> {formData.whereStudy.charAt(0).toUpperCase() + formData.whereStudy.slice(1)}
+                  </p>
+                  {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
+                    <>
+                      <p>
+                        <strong>Room Number:</strong> {formData.roomNumber}
+                      </p>
+                      <p>
+                        <strong>Hostel Name:</strong> {formData.hostelName}
+                      </p>
+                    </>
+                  )}
+                  <p>
+                    <strong>Additional Delivery Information:</strong> {formData.additionalDeliveryInfo}
+                  </p>
+                  <p>
+                    <strong>Address:</strong> {formData.address}
+                  </p>
+                  {formData.buildingName && (
+                    <p>
+                      <strong>Building Name:</strong> {formData.buildingName}
+                    </p>
+                  )}
+                  <p>
+                    <strong>City:</strong> {formData.city}
+                  </p>
+                  <p>
+                    <strong>Postal Code:</strong> {formData.postalCode}
+                  </p>
+                </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className="flex items-center mt-4">
+                <input
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  required
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+                  I agree to the{' '}
+                  <a href="/terms" className="text-primary hover:underline">
+                    Terms and Conditions
+                  </a>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  disabled={!emailOTPVerified || loadingSignup}
+                  className={`w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-white ${
+                    emailOTPVerified
+                      ? 'bg-primary hover:bg-blue-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200`}
+                >
+                  {loadingSignup ? (
+                    <>
+                      <FaSpinner className="animate-spin h-5 w-5 mr-3 text-white" />
+                      Signing Up...
                     </>
                   ) : (
-                    'Verify OTP'
+                    <>
+                      <FaUserPlus className="mr-2" />
+                      Sign Up
+                    </>
                   )}
                 </button>
-                {errors.emailOTP && (
-                  <p className="text-red-500 text-xs mt-1">{errors.emailOTP}</p>
-                )}
-              </div>
-            )}
-
-            {/* Password */}
-            <div className="mt-4">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  id="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Minimum 8 characters with letters and numbers"
-                  className={`mt-1 block w-full border ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="text-gray-500" />
-                  ) : (
-                    <FaEye className="text-gray-500" />
-                  )}
-                </div>
-              </div>
-              <PasswordStrengthBar password={formData.password} />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div className="mt-4">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <FaEyeSlash className="text-gray-500" />
-                  ) : (
-                    <FaEye className="text-gray-500" />
-                  )}
-                </div>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
-              )}
-            </div>
-
-            {/* Phone Number */}
-            <div className="mt-4">
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                Phone Number
-              </label>
-              <PhoneInput
-                country={'in'}
-                value={formData.phoneNumber}
-                onChange={handlePhoneChange}
-                inputProps={{
-                  name: 'phoneNumber',
-                  required: true,
-                  autoFocus: false,
-                }}
-                inputClass={`mt-1 block w-full border ${
-                  errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              />
-              {errors.phoneNumber && (
-                <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Delivery Details */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Delivery Details</h3>
-            {/* Where Study */}
-            <div>
-              <label htmlFor="whereStudy" className="block text-sm font-medium text-gray-700">
-                Where are you studying?
-              </label>
-              <select
-                name="whereStudy"
-                id="whereStudy"
-                value={formData.whereStudy}
-                onChange={handleInputChange}
-                required
-                className={`mt-1 block w-full border ${
-                  errors.whereStudy ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              >
-                <option value="">Select an option</option>
-                <option value="hostel">Hostel</option>
-                <option value="pg">PG</option>
-                <option value="home">Home</option>
-                <option value="other">Other</option>
-              </select>
-              {errors.whereStudy && (
-                <p className="text-red-500 text-xs mt-1">{errors.whereStudy}</p>
-              )}
-            </div>
-
-            {/* Room Number */}
-            {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
-              <div className="mt-4">
-                <label
-                  htmlFor="roomNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Room Number
-                </label>
-                <input
-                  type="text"
-                  name="roomNumber"
-                  id="roomNumber"
-                  value={formData.roomNumber}
-                  onChange={handleInputChange}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.roomNumber ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                {errors.roomNumber && (
-                  <p className="text-red-500 text-xs mt-1">{errors.roomNumber}</p>
-                )}
-              </div>
-            )}
-
-            {/* Hostel Name */}
-            {(formData.whereStudy === 'hostel' || formData.whereStudy === 'pg') && (
-              <div className="mt-4">
-                <label
-                  htmlFor="hostelName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Hostel Name
-                </label>
-                <input
-                  type="text"
-                  name="hostelName"
-                  id="hostelName"
-                  value={formData.hostelName}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Enter your hostel name"
-                  className={`mt-1 block w-full border ${
-                    errors.hostelName ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                {errors.hostelName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.hostelName}</p>
-                )}
-              </div>
-            )}
-
-            {/* Additional Delivery Information */}
-            <div className="mt-4">
-              <label
-                htmlFor="additionalDeliveryInfo"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Additional Delivery Information
-              </label>
-              <textarea
-                name="additionalDeliveryInfo"
-                id="additionalDeliveryInfo"
-                value={formData.additionalDeliveryInfo}
-                onChange={handleInputChange}
-                required
-                placeholder="Any additional information for delivery (e.g., landmarks, instructions)"
-                className={`mt-1 block w-full border ${
-                  errors.additionalDeliveryInfo ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              ></textarea>
-              {errors.additionalDeliveryInfo && (
-                <p className="text-red-500 text-xs mt-1">{errors.additionalDeliveryInfo}</p>
-              )}
-            </div>
-
-            {/* Address */}
-            <div className="mt-4">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                Address
-              </label>
-              <Autocomplete
-                onLoad={onLoadAddress}
-                onPlaceChanged={onPlaceChangedAddress}
-                options={{
-                  types: ['establishment', 'geocode'], // Prioritize establishments and geocodes
-                  componentRestrictions: { country: 'in' },
-                }}
-              >
-                <input
-                  type="text"
-                  name="address"
-                  id="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Search your address"
-                  className={`mt-1 block w-full border ${
-                    errors.address ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-              </Autocomplete>
-              {errors.address && (
-                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
-              )}
-            </div>
-
-            {/* Building Name */}
-            <div className="mt-4">
-              <label htmlFor="buildingName" className="block text-sm font-medium text-gray-700">
-                Building Name (Optional)
-              </label>
-              <input
-                type="text"
-                name="buildingName"
-                id="buildingName"
-                value={formData.buildingName}
-                onChange={handleInputChange}
-                placeholder="Enter your building name"
-                className={`mt-1 block w-full border ${
-                  errors.buildingName ? 'border-red-500' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-              />
-              {errors.buildingName && (
-                <p className="text-red-500 text-xs mt-1">{errors.buildingName}</p>
-              )}
-            </div>
-
-            {/* City and Postal Code */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              {/* City */}
-              <div>
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                  City
-                </label>
-                <input
-                  type="text"
-                  name="city"
-                  id="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.city ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-              </div>
-
-              {/* Postal Code */}
-              <div>
-                <label
-                  htmlFor="postalCode"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Postal Code
-                </label>
-                <input
-                  type="text"
-                  name="postalCode"
-                  id="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  required
-                  className={`mt-1 block w-full border ${
-                    errors.postalCode ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-primary focus:border-primary focus:outline-none py-3 px-4`}
-                />
-                {errors.postalCode && (
-                  <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>
+                {!emailOTPVerified && (
+                  <p className="text-red-500 text-xs mt-1">
+                    Please verify your email to proceed.
+                  </p>
                 )}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Terms and Conditions */}
-          <div className="flex items-center mt-4">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              I agree to the{' '}
-              <a href="/terms" className="text-primary hover:underline">
-                Terms and Conditions
-              </a>
-            </label>
-          </div>
-
-          {/* Submit Button */}
-          <div className="mt-6">
-            <button
-              type="submit"
-              disabled={!emailOTPVerified || loadingSignup}
-              className={`w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-white ${
-                emailOTPVerified
-                  ? 'bg-primary hover:bg-blue-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200`}
-            >
-              {loadingSignup ? (
-                <>
-                  <FaSpinner className="animate-spin h-5 w-5 mr-3 text-white" />
-                  Signing Up...
-                </>
-              ) : (
-                <>
-                  <FaUserPlus className="mr-2" />
-                  Sign Up
-                </>
-              )}
-            </button>
-            {!emailOTPVerified && (
-              <p className="text-red-500 text-xs mt-1">
-                Please verify your email to proceed.
-              </p>
-            )}
-          </div>
+          {/* Step 6: Confirmation (Optional) */}
+          {/* You can add a confirmation step if needed */}
         </form>
       </div>
       <ToastContainer />

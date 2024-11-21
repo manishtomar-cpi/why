@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../utils/dbConnect';
 import EmailOTP from '../../../models/EmailOTP';
 import User from '../../../models/User';
+
 export async function POST(request: Request) {
   const { email, otp } = await request.json();
 
@@ -43,11 +44,7 @@ export async function POST(request: Request) {
 
     // OTP is valid
     // Update user's emailVerified status if user exists
-    const user = await User.findOne({ email });
-    if (user) {
-      user.emailVerified = true;
-      await user.save();
-    }
+    await User.updateOne({ email }, { $set: { emailVerified: true } });
 
     // Delete OTP after verification
     await EmailOTP.deleteOne({ email });

@@ -5,16 +5,18 @@ import dbConnect from '../../../utils/dbConnect';
 import User from '../../../models/User';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import EmailValidator from 'email-validator';
+import bcrypt from 'bcrypt'; // For password hashing
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    // Extract data from the request body
+    console.log('Received data:', data); // Debugging: Log incoming data
+
+    // Destructure all necessary fields, including whereStudy
     const {
       firstName,
       lastName,
-      whereStudy,
       age,
       gender,
       userType,
@@ -30,11 +32,12 @@ export async function POST(request: Request) {
       email,
       password,
       phoneNumber,
+      whereStudy, // **Include whereStudy here**
       roomNumber,
       address, // This is an object
     } = data;
 
-    // Extract nested address fields
+    // Destructure nested address fields
     const {
       address: addrAddress,
       hostelName,
@@ -57,10 +60,6 @@ export async function POST(request: Request) {
       errors.lastName = 'Please provide your last name.';
     }
 
-    if (!whereStudy) {
-      errors.whereStudy = 'Please select where you are living.';
-    }
-
     if (!age || isNaN(Number(age)) || Number(age) < 13) {
       errors.age = 'You must be at least 13 years old.';
     }
@@ -71,6 +70,10 @@ export async function POST(request: Request) {
 
     if (!userType) {
       errors.userType = 'Please select your user type.';
+    }
+
+    if (!whereStudy) {
+      errors.whereStudy = 'Please select where you are living.';
     }
 
     // User Type-specific validations
@@ -154,7 +157,11 @@ export async function POST(request: Request) {
       }
 
       // If whereStudy is hostel or pg, and hostelName is missing
-      if ((whereStudy === 'hostel' || whereStudy === 'pg') && !hostelName) {
+      if (
+        userType === 'student' &&
+        (whereStudy === 'hostel' || whereStudy === 'pg') &&
+        !hostelName
+      ) {
         errors.hostelName = 'Please provide your hostel name.';
       }
 
@@ -177,7 +184,7 @@ export async function POST(request: Request) {
 
     // Check if email is already registered
     /*
-    // Commented out for testing to allow duplicate emails
+    // Uncomment this block if you want to prevent duplicate emails
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -193,11 +200,14 @@ export async function POST(request: Request) {
       finalInstitutionName = institutionOther;
     }
 
+    // Hash the password before saving
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     // Prepare user data
     const userData: any = {
       firstName,
       lastName,
-      whereStudy,
       age: Number(age),
       gender,
       userType,
@@ -210,16 +220,23 @@ export async function POST(request: Request) {
       companyName,
       jobTitle,
       email,
-      password,
+      password: hashedPassword, // Store hashed password
       phoneNumber,
+      whereStudy, // **Included here**
+      roomNumber:
+        whereStudy === 'hostel' || whereStudy === 'pg'
+          ? roomNumber
+          : undefined,
       address: {
-        address: addrAddress,
+        address: addrAddress, // Store the full formatted address
         hostelName:
-          whereStudy === 'hostel' || whereStudy === 'pg' ? hostelName : undefined,
+          whereStudy === 'hostel' || whereStudy === 'pg'
+            ? hostelName
+            : undefined,
         buildingName: buildingName || '',
-        additionalDeliveryInfo,
-        city,
-        postalCode,
+        additionalDeliveryInfo: additionalDeliveryInfo,
+        city: city,
+        postalCode: postalCode,
         coordinates: {
           type: 'Point',
           coordinates: coordinates.coordinates, // [longitude, latitude]
@@ -227,9 +244,7 @@ export async function POST(request: Request) {
       },
     };
 
-    if (whereStudy === 'hostel' || whereStudy === 'pg') {
-      userData.roomNumber = roomNumber;
-    }
+    console.log('User Data to Save:', userData); // Debugging: Log user data before saving
 
     // Create new user
     const newUser = new User(userData);
