@@ -12,6 +12,8 @@ export const ROUTES = {
     contact: '/contact',
     cart: '/cart',
     auth: '/auth',
+    signup: '/signup', // Directs to the Signup page
+  login: '/login',   // If you have a separate Login page
     faqs: '/faqs',
     enquiry: '/enquiry',
     complaint: '/complaint',
@@ -27,7 +29,7 @@ export const ROUTES = {
     privacyPolicy: '/privacy-policy',
     termsOfService: '/terms-of-service',
   
-    //why choose us page
+    // Why Choose Us Page
     featuresFreshIngredients: '/features/fresh-ingredients',
     featuresTimelyDelivery: '/features/timely-delivery',
     featuresAffordablePricing: '/features/affordable-pricing',
@@ -36,11 +38,18 @@ export const ROUTES = {
     featuresNutritionalExpertise: '/features/nutritional-expertise',
     featuresSubscriptionPlans: '/features/subscription-plans',
     featuresCustomerSupport: '/features/customer-support',
-
-   // Unique Features Routes
-  aboutOurFarmers: '/about/our-farmers',
-  aboutVisitKitchen: '/about/visit-kitchen',
-  aboutCommunitySupport: '/about/community-support',
-  aboutStudentAssistance: '/about/student-assistance',
+  
+    // Unique Features Routes
+    aboutOurFarmers: '/about/our-farmers',
+    aboutVisitKitchen: '/about/visit-kitchen',
+    aboutCommunitySupport: '/about/community-support',
+    aboutStudentAssistance: '/about/student-assistance',
+  
+    // New Routes for nav
+    blog: '/blog',
+    blogPost: '/blog/[slug]', // Dynamic route for individual blog posts
+    imageGallery: '/image-gallery',
+    cities: '/cities',
+    citiesKitchen: '/cities/kitchen', // Sub-route under Cities
   };
   
